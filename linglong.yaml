@@ -1,0 +1,40 @@
+version: "1"
+
+package:
+  id: io.github.dsnote
+  name: dsnote
+  version: 1.6.0.0
+  kind: app
+  description: |
+    Speech Note Linux app. Note taking, reading and translating with offline Speech to Text, Text to Speech and Machine translation.
+
+command:
+  - /opt/apps/io.github.dsnote/files/bin/dsnote
+
+base: org.deepin.foundation/23.0.0
+runtime: org.deepin.Runtime/23.0.1
+
+sources:
+  - kind: git
+    url: https://github.com/mkiol/dsnote.git
+    version: master
+    commit: 424bf0244d9f8eda0a08da85f86233994273e200
+  - kind: file
+    url: http://security.debian.org/debian-security/pool/updates/main/liba/libarchive/libarchive-dev_3.3.3-4+deb10u3_amd64.deb
+    digest: a943d692f3fdf9a5a1bb53608bb30a644a2b90e2ada4e9dc79499d25c71dff34
+  - kind: file
+    url: http://security.debian.org/debian-security/pool/updates/main/liba/libarchive/libarchive13_3.3.3-4+deb10u3_amd64.deb
+    digest: 0620b98b2cee9e3b1063331e43693970d525746f60a45852880143f39ddd1e7a
+  - kind: file
+    url: http://ftp.cn.debian.org/debian/pool/main/n/nettle/libnettle6_3.4.1-1+deb10u1_amd64.deb
+    digest: e7139151367e9ee82bb7c1664ce5793f8aa9310492604726d0f535f969394bdf
+build: |
+  bash ./install_dep linglong/sources $PREFIX
+
+  cd /project/linglong/sources/dsnote.git
+  git apply ../../../0001-install.patch
+  cd desktop 
+
+  qmake -makefile PREFIX=${PREFIX} LIB_INSTALL_DIR=${PREFIX}/lib/${TRIPLET}
+  make -j$(nproc)
+  make install
